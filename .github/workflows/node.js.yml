@@ -10,7 +10,7 @@ on:
 jobs:
   build:
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -18,12 +18,23 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: touch .env
-    - run: echo "${{ secrets.PROD_ENV_FILE }}" > .env
+    - name: Checkout Source
+      uses: actions/checkout@v3
+    - name: Login to Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build Docker Image
+      run: docker build -t lbarrantes28/api-ec2-express .
+    - name: Publish to Docker Hub
+      run: docker push lbarrantes28/api-ec2-express:latest
+  
+  deploy:
+    needs: build
+    runs-on: [ip-172-31-83-131]
+    steps:
+      - name: Pull Image from Docker Hub
+        run: docker pull lbarrantes28/api-ec2-express
+      - name: Delete Old Container
+        run: docker rm -f ec2-express-api-container
+      - name: Run Docker Container
+        run: docker run -d -p 5001:5001 -name ec2-express-api-container lbarrantes28/api-ec2-express
+
