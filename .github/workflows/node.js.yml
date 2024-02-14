@@ -31,7 +31,7 @@ jobs:
   
   deploy:
     needs: build
-    runs-on: [${{ secrets.EC2_HOST }}]
+    runs-on: ${{ secrets.EC2_HOST }}
     steps:
       - name: Pull Image from Docker Hub
         run: sudo docker pull lbarrantes28/api-ec2-express
