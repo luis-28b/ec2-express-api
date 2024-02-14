@@ -23,7 +23,7 @@ jobs:
     - name: Publish to Docker Hub
       run: sudo docker push lbarrantes28/api-ec2-express:latest
     - name: Deploy to EC2 Instance
-      uses: appleboy/ssh-actions@master
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
