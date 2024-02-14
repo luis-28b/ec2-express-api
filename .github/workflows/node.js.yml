@@ -31,7 +31,7 @@ jobs:
   
   deploy:
     needs: build
-    runs-on: [ec2-18-207-205-202.compute-1.amazonaws.com]
+    # runs-on: [ec2-18-207-205-202.compute-1.amazonaws.com]
     steps:
       - name: Pull Image from Docker Hub
         run: sudo docker pull lbarrantes28/api-ec2-express
