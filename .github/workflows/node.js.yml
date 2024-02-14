@@ -9,14 +9,10 @@ on:
 
 jobs:
   build:
-
     runs-on: self-hosted
-
     strategy:
       matrix:
         node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
     - name: Checkout Source
       uses: actions/checkout@v3
@@ -26,10 +22,16 @@ jobs:
       run: sudo docker build -t lbarrantes28/api-ec2-express .
     - name: Publish to Docker Hub
       run: sudo docker push lbarrantes28/api-ec2-express:latest
+    - name: Deploy to EC2 Instance
+      uses: appleboy/ssh-actions@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
   
   deploy:
     needs: build
-    runs-on: [ip-172-31-83-131]
+    runs-on: [${{ secrets.EC2_HOST }}]
     steps:
       - name: Pull Image from Docker Hub
         run: sudo docker pull lbarrantes28/api-ec2-express
